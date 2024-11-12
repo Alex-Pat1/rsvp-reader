@@ -19,27 +19,35 @@
 <body>
     <div id="word-container"></div>
     <div id="controls">
-        <input type="number" id="speed" placeholder="Speed (ms per word)" value="300">
+        <textarea id="user-text" placeholder="Enter text to read here..." rows="5" cols="40"></textarea><br>
+        <input type="number" id="wpm" placeholder="Words per minute" value="200"><br><br>
         <button onclick="startReading()">Start Reading</button>
     </div>
 
     <script>
-        const text = "This is an example sentence for RSVP reading. It will display word by word.";
         let wordIndex = 0;
         let interval;
-
+        
         function startReading() {
-            const speed = document.getElementById('speed').value;
-            const words = text.split(" ");
+            const userText = document.getElementById('user-text').value;
+            const wpm = document.getElementById('wpm').value;
+            const words = userText.split(" ");
+            
+            // Calculate milliseconds per word based on words per minute
+            const msPerWord = 60000 / wpm;
+            
+            // Clear any existing interval and reset word index
             clearInterval(interval);
+            wordIndex = 0;
+
             interval = setInterval(() => {
                 if (wordIndex < words.length) {
                     document.getElementById('word-container').textContent = words[wordIndex];
                     wordIndex++;
                 } else {
-                    clearInterval(interval);
+                    clearInterval(interval); // Stop when all words are displayed
                 }
-            }, speed);
+            }, msPerWord);
         }
     </script>
 </body>
