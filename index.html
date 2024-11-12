@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RSVP Reader</title>
+    <style>
+        #word-container {
+            font-size: 30px;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 200px;
+        }
+        #controls {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="word-container"></div>
+    <div id="controls">
+        <input type="number" id="speed" placeholder="Speed (ms per word)" value="300">
+        <button onclick="startReading()">Start Reading</button>
+    </div>
+
+    <script>
+        const text = "This is an example sentence for RSVP reading. It will display word by word.";
+        let wordIndex = 0;
+        let interval;
+
+        function startReading() {
+            const speed = document.getElementById('speed').value;
+            const words = text.split(" ");
+            clearInterval(interval);
+            interval = setInterval(() => {
+                if (wordIndex < words.length) {
+                    document.getElementById('word-container').textContent = words[wordIndex];
+                    wordIndex++;
+                } else {
+                    clearInterval(interval);
+                }
+            }, speed);
+        }
+    </script>
+</body>
+</html>
