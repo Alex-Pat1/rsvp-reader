@@ -17,6 +17,9 @@
     </style>
 </head>
 <body>
+    <!-- Placeholder for dynamically loaded header -->
+    <div id="header"></div>
+
     <div id="word-container"></div>
     <div id="controls">
         <textarea id="user-text" placeholder="Enter text to read here..." rows="5" cols="40"></textarea><br>
@@ -25,9 +28,17 @@
     </div>
 
     <script>
+        // JavaScript to fetch and insert the header content
+        fetch("header.html")
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById("header").innerHTML = data;
+            })
+            .catch(error => console.error("Error loading the header:", error));
+
         let wordIndex = 0;
         let interval;
-        
+
         function startReading() {
             const userText = document.getElementById('user-text').value;
             const wpm = document.getElementById('wpm').value;
