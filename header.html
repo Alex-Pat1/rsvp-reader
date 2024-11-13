@@ -32,8 +32,10 @@
         }
 
         .logo img {
-            height: 40px;
+            height: 40px;  /* Increased height to make the logo larger */
             margin-right: 15px;
+            max-width: 100%; /* Ensures it doesn't exceed container size */
+            width: auto; /* Maintain aspect ratio */
         }
 
         .logo span {
@@ -81,7 +83,7 @@
 <body>
     <header>
         <div class="logo">
-            <img src="Knowvu_logo.png">
+            <img src="Knowvu_logo_rembg.png" alt="Knowvu Logo">
         </div>
         <nav>
             <!-- Inside the header HTML -->
