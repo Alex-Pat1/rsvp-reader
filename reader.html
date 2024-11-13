@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RSVP Reader</title>
+    <style>
+        #word-container {
+            font-size: 30px;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 200px;
+        }
+        #controls {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="word-container"></div>
+    <div id="controls">
+        <textarea id="user-text" placeholder="Enter text to read here..." rows="5" cols="40"></textarea><br>
+        <input type="number" id="wpm" placeholder="Words per minute" value="200"><br><br>
+        <button onclick="startReading()">Start Reading</button>
+    </div>
+
+    <script>
+        let wordIndex = 0;
+        let interval;
+        
+        function startReading() {
+            const userText = document.getElementById('user-text').value;
+            const wpm = document.getElementById('wpm').value;
+            const words = userText.split(" ");
+            
+            // Calculate milliseconds per word based on words per minute
+            const msPerWord = 60000 / wpm;
+            
+            // Clear any existing interval and reset word index
+            clearInterval(interval);
+            wordIndex = 0;
+
+            interval = setInterval(() => {
+                if (wordIndex < words.length) {
+                    document.getElementById('word-container').textContent = words[wordIndex];
+                    wordIndex++;
+                } else {
+                    clearInterval(interval); // Stop when all words are displayed
+                }
+            }, msPerWord);
+        }
+    </script>
+</body>
+</html>
