@@ -5,14 +5,99 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RSVP Reader</title>
     <style>
+        /* Center the text container */
         #word-container {
-            font-size: 30px;
+            font-size: 60px;  /* Larger font for readability */
             font-family: Arial, sans-serif;
             text-align: center;
-            margin-top: 200px;
+            position: absolute;  /* Absolute positioning to ensure centering */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%); /* Center horizontally and vertically */
+            margin: 0;
         }
+
         #controls {
             text-align: center;
+            position: absolute;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        /* Hidden controls once reading starts */
+        .hidden {
+            display: none;
+        }
+
+        /* Styling for buttons */
+        .cta-button {
+            padding: 10px 20px;
+            font-size: 18px;
+            cursor: pointer;
+            margin: 5px;
+            background-color: #c41818;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .cta-button:hover {
+            background-color: #3a9e42;
+            transition: background-color 0.3s ease;
+        }
+
+        /* Position the pause/play buttons below the word container */
+        #pause-play-buttons {
+            text-align: center;
+            margin-top: 500px;  /* Add spacing from the word container */
+        }
+
+        /* Modern styling for the textarea */
+        #user-text {
+            width: 100%;  /* 80% of the page width */
+            min-width: 300px;  /* Minimum width to prevent shrinking too much */
+            max-width: 1000px;  /* Maximum width to keep it in reasonable proportions */
+            height: 200px;  /* Fixed height */
+            font-size: 16px;  /* Readable text size */
+            margin-top: 10px;
+            resize: none;  /* Disable resizing */
+            padding: 15px;  /* Added padding for better readability */
+            border-radius: 8px;  /* Rounded corners for a modern look */
+            border: 1px solid #ccc;  /* Light border color */
+            background-color: #f9f9f9;  /* Light background color */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);  /* Subtle shadow for depth */
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;  /* Smooth transition */
+        }
+
+        /* Focus effect for modern look */
+        #user-text:focus {
+            border-color: #c41818;  /* Match button color */
+            background-color: #fff;  /* Lighter background when focused */
+            box-shadow: 0 0 8px rgba(196, 24, 24, 0.3);  /* Focus shadow */
+            outline: none;  /* Remove default outline */
+        }
+
+        /* Modern styling for the words per minute input */
+        #wpm {
+            padding: 10px;
+            font-size: 18px;
+            width: 150px;  /* Set a fixed width for consistency */
+            margin-top: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* Focus effect for words per minute input */
+        #wpm:focus {
+            border-color: #c41818;  /* Match button color */
+            background-color: #fff;
+            box-shadow: 0 0 8px rgba(196, 24, 24, 0.3);  /* Focus shadow */
+            outline: none;  /* Remove default outline */
         }
     </style>
 </head>
@@ -21,10 +106,16 @@
     <div id="header"></div>
 
     <div id="word-container"></div>
-    <div id="controls">
+    <div id="controls" class="visible">
         <textarea id="user-text" placeholder="Enter text to read here..." rows="5" cols="40"></textarea><br>
         <input type="number" id="wpm" placeholder="Words per minute" value="200"><br><br>
-        <button onclick="startReading()">Start Reading</button>
+        <button onclick="startReading()" class="cta-button">Start Reading</button>
+    </div>
+    
+    <div id="pause-play-buttons" class="hidden">
+        <!-- Pause and Play buttons -->
+        <button id="pause-btn" class="cta-button" onclick="togglePause()">Pause</button>
+        <button id="play-btn" class="cta-button hidden" onclick="togglePause()">Play</button>
     </div>
 
     <script>
@@ -38,6 +129,7 @@
 
         let wordIndex = 0;
         let interval;
+        let isPaused = false;
 
         function startReading() {
             const userText = document.getElementById('user-text').value;
@@ -47,18 +139,56 @@
             // Calculate milliseconds per word based on words per minute
             const msPerWord = 60000 / wpm;
             
+            // Hide the controls once reading starts
+            document.getElementById('controls').classList.add('hidden');
+
+            // Show the pause/play buttons after start
+            document.getElementById('pause-play-buttons').classList.remove('hidden');
+
             // Clear any existing interval and reset word index
             clearInterval(interval);
             wordIndex = 0;
 
             interval = setInterval(() => {
-                if (wordIndex < words.length) {
+                if (!isPaused && wordIndex < words.length) {
                     document.getElementById('word-container').textContent = words[wordIndex];
                     wordIndex++;
-                } else {
+                } else if (wordIndex >= words.length) {
                     clearInterval(interval); // Stop when all words are displayed
+                    document.getElementById('pause-play-buttons').classList.add('hidden'); // Hide buttons after reading is complete
                 }
             }, msPerWord);
+        }
+
+        function togglePause() {
+            const pauseButton = document.getElementById('pause-btn');
+            const playButton = document.getElementById('play-btn');
+            isPaused = !isPaused; // Toggle paused state
+
+            if (isPaused) {
+                clearInterval(interval); // Pause the reading
+                pauseButton.classList.add('hidden'); // Hide Pause button
+                playButton.classList.remove('hidden'); // Show Play button
+            } else {
+                // Resume the reading by restarting the interval
+                const userText = document.getElementById('user-text').value;
+                const wpm = document.getElementById('wpm').value;
+                const words = userText.split(" ");
+                const msPerWord = 60000 / wpm;
+
+                interval = setInterval(() => {
+                    if (!isPaused && wordIndex < words.length) {
+                        document.getElementById('word-container').textContent = words[wordIndex];
+                        wordIndex++;
+                    } else if (wordIndex >= words.length) {
+                        clearInterval(interval); // Stop when all words are displayed
+                        document.getElementById('pause-play-buttons').classList.add('hidden'); // Hide buttons after reading is complete
+                    }
+                }, msPerWord);
+                
+                playButton.classList.add('hidden'); // Hide Play button
+                pauseButton.classList.remove('hidden'); // Show Pause button
+            }
         }
     </script>
 </body>
